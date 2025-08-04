@@ -1,13 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API</title>
+    <title>Búsqueda de Usuarios</title>
+    
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f4f7f9;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background-color: #ffffff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #1a2533;
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        /* Estilos para el formulario de búsqueda */
+        .search-form {
+            display: flex;
+            gap: 10px; /* Espacio entre el campo de texto y el botón */
+            margin-bottom: 30px;
+        }
+
+        #searchInput {
+            flex-grow: 1; /* El campo de texto ocupa el espacio disponible */
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            transition: border-color 0.3s;
+        }
+
+        #searchInput:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        #searchButton {
+            padding: 12px 20px;
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+        
+        /* Estilos para el contenedor de resultados */
+        #resultsContainer {
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .user-card {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        
+        .user-card h3 {
+            margin: 0 0 5px 0;
+            color: #0056b3;
+        }
+
+        .user-card p {
+            margin: 0;
+            color: #555;
+        }
+    </style>
 </head>
 <body>
-    <title>API DEMO
-    <h1>API DEMO</h1>
-    </title>
+
+    <div class="container">
+        <header>
+            <h1>Buscador de Usuarios</h1>
+        </header>
+        
+        <main>
+            <form id="searchForm" class="search-form">
+                <label for="searchInput" class="sr-only">Buscar Usuario</label> <input type="text" id="searchInput" name="query" placeholder="Escribe un nombre o email..." required>
+                <button type="submit" id="searchButton">Buscar</button>
+            </form>
+            
+            <div id="resultsContainer">
+                <p>Los resultados de la búsqueda aparecerán aquí.</p>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // --- LÓGICA DE INTERACCIÓN Y CONEXIÓN CON API ---
+
+        // 1. Obtener referencias a los elementos del DOM
+        const searchForm = document.getElementById('searchForm');
+        const searchInput = document.getElementById('searchInput');
+        const resultsContainer = document.getElementById('resultsContainer');
+
+        // 2. Escuchar el evento 'submit' del formulario
+        searchForm.addEventListener('submit', function(event) {
+            // Prevenir el comportamiento por defecto del formulario (que es recargar la página)
+            event.preventDefault(); 
+            
+            // Obtener el valor del campo de búsqueda y limpiar espacios en blanco
+            const query = searchInput.value.trim();
+
+            // Si el campo no está vacío, realizar la búsqueda
+            if (query) {
+                resultsContainer.innerHTML = '<p>Buscando...</p>'; // Mensaje de carga
+                findUsers(query);
+            }
+        });
+
+        // 3. Función para buscar usuarios (aquí harás la llamada a tu API)
+        async function findUsers(searchTerm) {
+            // URL de tu API. Reemplaza 'https://api.tu-dominio.com/usuarios' con la URL real.
+            // Es común pasar el término de búsqueda como un parámetro de consulta (query parameter), ej: ?q=...
+            const apiUrl = `https://api.tu-dominio.com/usuarios?search=${encodeURIComponent(searchTerm)}`;
+
+            try {
+                // *** AQUÍ VA LA LLAMADA A TU API CON fetch ***
+                // Descomenta las siguientes líneas cuando tengas tu API lista
+                
+                /*
+                const response = await fetch(apiUrl);
+                
+                if (!response.ok) {
+                    throw new Error(`Error en la API: ${response.statusText}`);
+                }
+                
+                const users = await response.json(); // Convertir la respuesta a JSON
+                displayResults(users); // Mostrar los resultados
+                */
+
+                // --- INICIO: Bloque de simulación (BORRAR CUANDO CONECTES TU API) ---
+                console.log(`Simulando búsqueda para: "${searchTerm}"`);
+                const mockUsers = [
+                    { id: 1, nombre: 'Ana García', email: 'ana.garcia@example.com' },
+                    { id: 2, nombre: 'Carlos Santana', email: 'carlos.s@example.com' },
+                    { id: 3, nombre: 'Ana Torres', email: 'ana.t@example.com' }
+                ];
+                setTimeout(() => displayResults(mockUsers.filter(u => u.nombre.toLowerCase().includes(searchTerm.toLowerCase()))), 1000); // Simula un retraso de red
+                // --- FIN: Bloque de simulación ---
+
+            } catch (error) {
+                console.error('Hubo un error al buscar usuarios:', error);
+                resultsContainer.innerHTML = `<p style="color: red;">Error al conectar con el servicio. Inténtalo más tarde.</p>`;
+            }
+        }
+
+        // 4. Función para mostrar los resultados en el HTML
+        function displayResults(users) {
+            // Limpiar resultados anteriores
+            resultsContainer.innerHTML = '';
+
+            if (users.length === 0) {
+                resultsContainer.innerHTML = '<p>No se encontraron usuarios con ese criterio.</p>';
+                return;
+            }
+
+            // Crear y añadir un elemento por cada usuario encontrado
+            users.forEach(user => {
+                const userCard = document.createElement('div');
+                userCard.className = 'user-card';
+                
+                userCard.innerHTML = `
+                    <h3>${user.nombre}</h3>
+                    <p>Email: ${user.email}</p>
+                `;
+                
+                resultsContainer.appendChild(userCard);
+            });
+        }
+    </script>
+
 </body>
 </html>
